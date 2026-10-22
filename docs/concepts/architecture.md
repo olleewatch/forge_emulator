@@ -62,6 +62,10 @@ The emulator mirrors the firmware closely, but some things differ:
 
 - It runs your browser's JavaScript engine, which supports more of the
   language than Espruino. Test on the watch before you share a face.
+- Espruino doesn't hoist function declarations: a function only exists once
+  the script has run past it. Code at the top level that calls a function
+  declared further down works in the emulator but fails on the watch.
+  Calls from hooks are fine, because hooks run after the whole script has loaded.
 - Sensors are simulated: steps are fixed at 5000, temperature drifts around
   23 °C, battery reads 2.9 V, and location is fixed to Toronto.
 - Timers are as accurate as the browser's, and speed or memory limits aren't

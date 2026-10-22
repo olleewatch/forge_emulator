@@ -43,6 +43,9 @@ browser.
   directly; `getTimezoneOffset()` is 0.
 - Use ES5-style code (`var`, `function`) when in doubt. Espruino doesn't support
   every modern JS feature, and the emulator won't catch that.
+- **Declare functions before top-level code calls them.** Espruino doesn't hoist
+  function declarations, so `var t = make();` above `function make() {...}`
+  fails on the watch. The emulator's browser engine hoists, so it won't catch it.
 
 Start from [examples/template.js](examples/template.js), or a closer example in
 [examples/](examples/).

@@ -538,6 +538,18 @@ function millisNow() {
 // on-screen button stuck lit.
 // The HOLD icon lights once the hold period elapses whether or not the
 // script subscribes to *_long - it shows the physical hold registering.
+// Mouse and touch both drive press/release. Mobile Safari only synthesizes mouse
+// events after a touch ends, so without the touch listeners a hold or a
+// two-finger A+L press can't happen on a phone or tablet.
+function bindPressRelease(el, press, release) {
+  el.addEventListener('mousedown', press);
+  el.addEventListener('mouseup', release);
+  el.addEventListener('mouseleave', release);
+  el.addEventListener('touchstart', (e) => { e.preventDefault(); press(); }, { passive: false });
+  el.addEventListener('touchend', (e) => { e.preventDefault(); release(); }, { passive: false });
+  el.addEventListener('touchcancel', release);
+}
+
 function createHoldableButton({ el, holdMs, shortBit, shortHook, longBit, longHook, btnConst, setVisual, setHold }) {
   let holdTimer = null;
   let held = false;
@@ -562,9 +574,7 @@ function createHoldableButton({ el, holdMs, shortBit, shortHook, longBit, longHo
     setHold(false);
     if (running && (effectiveSubs & E_BUTTONS)) runHook(hooks.button, 'button', btnConst, E_UP, millisNow());
   }
-  el.addEventListener('mousedown', press);
-  el.addEventListener('mouseup', release);
-  el.addEventListener('mouseleave', release);
+  bindPressRelease(el, press, release);
   return { press, release };
 }
 
@@ -623,9 +633,7 @@ function createModeButton(el, setVisual, setHold) {
     if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
     setHold(false);
   }
-  el.addEventListener('mousedown', press);
-  el.addEventListener('mouseup', release);
-  el.addEventListener('mouseleave', release);
+  bindPressRelease(el, press, release);
   return { press, release };
 }
 
@@ -652,9 +660,7 @@ function createMomentaryButton({ el, bit, hook, setVisual }) {
     held = false;
     setVisual(false);
   }
-  el.addEventListener('mousedown', press);
-  el.addEventListener('mouseup', release);
-  el.addEventListener('mouseleave', release);
+  bindPressRelease(el, press, release);
   return { press, release };
 }
 
